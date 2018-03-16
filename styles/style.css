@@ -1,0 +1,97 @@
+div#resultBox {
+	font-family: Roboto;
+	background-color: transparent;
+	margin: 0px 75px 50px 75px;
+	padding: 10px 10px 10px 10px;
+}
+div#content {
+	font-family: Roboto;
+	background-color: transparent;
+	margin: 10px 75px 25px 75px;
+	padding: 10px 10px 10px 10px;
+}
+table#indexWords {
+	table-layout: fixed;
+}
+table#indexWords td {
+	padding: 5px 5px 5px 5px;
+	border: 1px solid #FF9966;
+	word-wrap:break-word;
+}
+td#word {
+	font-weight: bold;
+	width: 200px;
+	vertical-align: middle;
+	text-align: left;
+}
+td#file-name {
+	width: 200px;
+	vertical-align: middle;
+	text-align: center;
+}
+td#line-nos {
+	width: 300px;
+	vertical-align: middle;
+	text-align: left;
+}
+p#title {
+	font-family: Lato;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	font-size: 20px;
+	font-weight: bold;
+}
+div#head-title {
+	background-color: blue;
+	padding-top: 12px;
+	padding-bottom: 12px;
+	/*font-family: Lato;
+	margin: 0 0 0 0;
+	margin-top: 1px;
+	font-size: 20px;*/
+	position: fixed;
+	width: 100%
+}
+input[type=text] {
+	padding:5px;
+	font-size: 15px;
+	border-radius: 5px;
+	display: inline-block;
+	font-weight: normal;
+	font-family: Roboto;
+}
+button#search-button, #disp-button {
+	font-size: 15px;
+	font-weight: normal;
+	border-radius: 5px;
+}
+div#footer {
+	font-family: Roboto;
+	bottom: 0px;
+	width: 100%;
+	padding: 10px 0px 5px 0px;
+	position: fixed;
+	text-align: center;
+	background-color: #FFF;
+	margin-left, margin-right: auto;
+}
+table#codeTable {
+	table-layout: fixed;
+	font-family: Lato;
+}
+table#codeTable td {
+	border: 1px solid #FF9966;
+}
+/*td#lineno {
+	padding-left: 20px;
+	padding-right: 20px;
+}*/
+td#codetext {
+	word-wrap: break-word;
+	width: 580px;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+textarea {
+	background-color: white;
+}
