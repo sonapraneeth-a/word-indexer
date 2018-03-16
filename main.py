@@ -14,7 +14,7 @@ outputFile = "Output File "+utility.outfile;
 utility.verbosePrint(indirName, utility.verbose)
 utility.verbosePrint(outputFile, utility.verbose)
 
-# Calculate getAllFilesinDir time 
+# Calculate getAllFilesinDir time
 start_time = time.time()
 reqFiles = printHTMLList.getAllFilesinDir(utility.indir);
 reqFilesTime = time.time() - start_time

@@ -17,7 +17,7 @@ Function to remove HTML Tags
 input :
     line : the line (or subline) to remove HTML tags from
     isWithingTag : represents whether the line was already inside a tag before it began
-    level : the depth of the stack at this recursion point. Used for debugging purpose	
+    level : the depth of the stack at this recursion point. Used for debugging purpose
 '''
 def removeHTMLTags(line, iswithintag, level) :
     #These are the HTML tags which will be removed
@@ -41,7 +41,7 @@ def removeHTMLTags(line, iswithintag, level) :
     if linecopy.find("<") == -1:   # if a tag doesnt start in the line, return back the whole line
         #print("here2" +" " + line)
         return False,line
-    
+
 	# else recursively remove tags
     while linecopy.find("<") >=0 :
         returnline=returnline+linecopy[0:linecopy.find("<")]
@@ -134,6 +134,7 @@ def populateDict(l) :
             line_number += 1
 
     word_dict = removeStopWords(word_dict)
+    # print(word_dict)
     for key in word_dict.keys() :
         value = word_dict[key]
         word_dict[key]=list(map(lambda x:[x,value[x]],(sorted(value, key=lambda k: len(value[k]), reverse=True)))) #order by filename by frequency

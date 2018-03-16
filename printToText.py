@@ -27,7 +27,7 @@ def printToText(wordsList):
 				if(l==1 and k!=lenLineNoArray):
 					indexFile.write(word)
 					indexFile.write(", ")
-					indexFile.write(relativeFilePath)
+					indexFile.write(os.path.normpath(relativeFilePath))
 					indexFile.write(", ")
 					indexFile.write(str(lineNo))
 					indexFile.write(" ")
@@ -36,7 +36,7 @@ def printToText(wordsList):
 				elif(l==1 and k==lenLineNoArray):
 					indexFile.write(word)
 					indexFile.write(", ")
-					indexFile.write(relativeFilePath)
+					indexFile.write(os.path.normpath(relativeFilePath))
 					indexFile.write(", ")
 					indexFile.write(str(lineNo))
 					indexFile.write("\n")

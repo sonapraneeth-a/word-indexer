@@ -68,7 +68,12 @@ def printToHTMLCompleteList(wordsList, outfile):
 		infoWordList = wordInfo[1]
 		lenInfoWordList = len(infoWordList)
 		for fileName in infoWordList:
-			relativeFilePath = os.path.relpath(fileName[0], '.')
+			unixFileName = "/".join(fileName[0].split('\\'))
+			# print(os.path.normpath(os.path.relpath(fileName[0], '.')))
+			relativeFilePath = os.path.relpath(unixFileName, '.')
+			normRelativeFilePath = os.path.normpath(relativeFilePath)
+			# print("Relative path: ", relativeFilePath)
+			# print("Relative normalize path: ", normRelativeFilePath)
 			baseFileNameArray = relativeFilePath.split('/');
 			baseFileName = baseFileNameArray[-1]
 			lineNoArray = fileName[1]
@@ -80,13 +85,13 @@ def printToHTMLCompleteList(wordsList, outfile):
 					indexFile.write("\t\t\t"+"<tr>"+"\n\t\t\t\t"+"<td id=\"word\">")
 					indexFile.write(word)
 					indexFile.write("</td>\n")
-					indexFile.write("\t\t\t\t<td id=\"file-name\"><a href=\"#codeTable\" onclick=\"populatePre('"+relativeFilePath+"')\">")
+					indexFile.write("\t\t\t\t<td id=\"file-name\"><a href=\"#codeTable\" onclick=\"populatePre('"+ normRelativeFilePath+"')\">")
 					indexFile.write(baseFileName)
 					indexFile.write("</a></td>\n")
 					indexFile.write("\t\t\t\t<td id=\"line-nos\">")
 					indexFile.write("<a href=\"#");
 					indexFile.write(str(lineNo))
-					indexFile.write("\" onclick=\"populatePre('"+relativeFilePath+"')\">");
+					indexFile.write("\" onclick=\"populatePre('"+ normRelativeFilePath+"')\">");
 					indexFile.write(str(lineNo))
 					indexFile.write("</a>&nbsp;");
 					l += 1
@@ -95,13 +100,13 @@ def printToHTMLCompleteList(wordsList, outfile):
 					indexFile.write("\t\t\t"+"<tr>"+"\n\t\t\t\t"+"<td id=\"word\">")
 					indexFile.write(word)
 					indexFile.write("</td>\n")
-					indexFile.write("\t\t\t\t<td id=\"file-name\"><a href=\"#codeTable\" onclick=\"populatePre('"+relativeFilePath+"')\">")
+					indexFile.write("\t\t\t\t<td id=\"file-name\"><a href=\"#codeTable\" onclick=\"populatePre('"+normRelativeFilePath+"')\">")
 					indexFile.write(baseFileName)
 					indexFile.write("</a></td>\n")
 					indexFile.write("\t\t\t\t<td id=\"line-nos\">")
 					indexFile.write("<a href=\"#");
 					indexFile.write(str(lineNo))
-					indexFile.write("\" onclick=\"populatePre('"+relativeFilePath+"')\">");
+					indexFile.write("\" onclick=\"populatePre('"+normRelativeFilePath+"')\">");
 					indexFile.write(str(lineNo))
 					indexFile.write("</a>");
 					indexFile.write("</td>\n")
@@ -111,7 +116,7 @@ def printToHTMLCompleteList(wordsList, outfile):
 				elif(l%noEntries!=0 and k!=lenLineNoArray):
 					indexFile.write("<a href=\"#");
 					indexFile.write(str(lineNo))
-					indexFile.write("\" onclick=\"populatePre('"+relativeFilePath+"')\">");
+					indexFile.write("\" onclick=\"populatePre('"+ normRelativeFilePath+"')\">");
 					indexFile.write(str(lineNo))
 					indexFile.write("</a>&nbsp;");
 					l += 1
@@ -119,7 +124,7 @@ def printToHTMLCompleteList(wordsList, outfile):
 				elif(l%noEntries!=0 and k==lenLineNoArray):
 					indexFile.write("<a href=\"#");
 					indexFile.write(str(lineNo))
-					indexFile.write("\" onclick=\"populatePre('"+relativeFilePath+"')\">");
+					indexFile.write("\" onclick=\"populatePre('"+ normRelativeFilePath+"')\">");
 					indexFile.write(str(lineNo))
 					indexFile.write("</a>");
 					indexFile.write("</td>\n")
@@ -129,7 +134,7 @@ def printToHTMLCompleteList(wordsList, outfile):
 				elif(l%noEntries==0):
 					indexFile.write("<a href=\"#");
 					indexFile.write(str(lineNo))
-					indexFile.write("\" onclick=\"populatePre('"+relativeFilePath+"')\">");
+					indexFile.write("\" onclick=\"populatePre('"+ normRelativeFilePath+"')\">");
 					indexFile.write(str(lineNo))
 					indexFile.write("</a>");
 					indexFile.write("</td>\n")

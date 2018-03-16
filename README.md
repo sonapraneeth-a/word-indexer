@@ -6,10 +6,14 @@ Making Index file (as in the back of book) for a directory.
 
 Sona Praneeth Akula, Siddharth A
 
+## Issues
+
+Currently, the program doesnot run correctly on Windows due to problem in filenames handling.
+
 ## Installation
 
 ```bash
-$ # Requires Python3.4 
+$ # Requires Python3.4
 $ sudo apt-get install python3-numpy
 $ sudo apt-get install python3-scipy python3-matplotlib # for python plots
 ```
@@ -31,7 +35,7 @@ $ python3.4 main.py -i "indir" # Sample run
 - Type a word in the searchbox to get list of files along with their line nos in their respective files in a table format
 - Click on either file/line no to get to the word in the required line in file.(Just scroll three lines upwards to see the exact line)
 
-## Versions used: 
+## Versions used:
 
 - python3.4.3
 - matplotlib 1.3.1: for plotting performance graphs in python, else not required
