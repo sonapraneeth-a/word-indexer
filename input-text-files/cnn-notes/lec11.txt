@@ -1,0 +1,151 @@
+Resource allocation: QoS, fairness
+====================================
+
+**** Outline
+- Resource allocation, QoS, and fairness
+- QoS architectures: Intserv and Diffserv
+- Admission control: Token Bucket Filter
+
+* Basic problem: internet only provides best effort. That is, resource
+  allocation (bandwidth allocation on links in particular) is
+  adhoc. Such a system cannot provide any Quality of Service (QoS) or
+  fairness to users. What can you do to get better QoS or better
+  fairness from the Internet?
+
+* By QoS, we mean end-to-end bandwidth and delay
+  guarantees. Paricularly important for real time audio/video
+  applications. Multimedia applications can withstand a small amount
+  of delay by buffering incoming data and delaying playback by few
+  hundreds of milliseconds. However, they cannot delay playback by
+  much for interactivity. So such applications will work well if there
+  is some bound on end-to-end latency. Most applications have some
+  basic adaptability built into them (e.g., change resolution of video
+  stream or adjust playback buffer), so are able to survive on
+  Internet today even though no QoS mechanism is in place.
+
+* Clasification of applications for QoS: elastic (any bandwidth at any
+  time, e.g., FTP) and interactive (need some minimum bandwidth to be
+  useful). Interactive can be non-real time (e.g., web) or real
+  time. Real-time can be intolerant (e.g., mission critical
+  applications) or tolerant. Toleratant can be non-adaptive (voice
+  calls with fixed encoding) or adaptive. Adaptive is further delay
+  adaptive (can change play back point) or rate adaptive (can change
+  video resolution). Typically, you need special treatment for
+  intolerant realtime services, and next class for tolerant realtime
+  services. The rest can be handled by best effort.
+
+* QoS is not the only reason for considering extra mechanisms to the
+  basic internet. The other is to provide fairness among flows.
+
+* What is fairness? Two popular definitions: Jain fairness index and
+  max-min fairness.
+
+* Jain fairness index = [sum(xi)]^2 / n sum (xi^2). Equal to 1 if all
+  xi = 1. Equal to 1/n if only one xi=1 and rest 0. Measures extent of
+  fairness.
+
+* However, sometimes, some flows may not have enough traffic to send,
+  in which case they cannot get equal share of bandwidth. Suppose 2
+  FTP flows and 2 audio flows sharing a link of 1 Mbps. Audio call
+  generates 100 kbps each. In that case, it is not possible ot
+  allocate 250 kbps of "fair share" to audio. What is fair allocation
+  here? Since audio need lesser than fair share, give them 100 kbps
+  each. Remaining 800 kbps is split between 2 FTP flows equally. This
+  notion of fairness is called "max-min" fairness. The name comes from
+  the fact that the minimum rate is maximized. How to do a max-min
+  allocation? Start filling each flow until it hits its
+  limit. Continue with the other flows.
+
+* What is the Jain index for the above case? It doesn't appear "fair"
+  by this measure. So max-min is considered a better metric of
+  fairness in this case.
+
+* Summary: we will study modifications to the Internet proposed, that
+  aim to provide better QoS and fairness. The high-level problem is
+  that of resource allocation - how to allocate network resources
+  (bandwidth) to competing flows.
+
+* Two major streams of thought - Integrated Servicers (Intserv) and
+  Differentiated Services (Diffserv). Main difference is scalability -
+  Intserv maintains per-flow state in routers and makes sure each flow
+  meets its requirements. Diffserv groups traffic into few classes and
+  works with them. So Diffserv is more scalable.
+
+* Main components of any QoS scheme (specifically IntServ):
+
+- Flow specification. Each flow must specify what its generated
+  traffic will be like (Tspec), and what are its requirements in terms
+  of delay and bandwidth/loss (Rspec). Flow can be TCP flow, per user
+  traffic, a traffic class (like video) etc.
+
+- Reservation and admission control (RSVP). Sender sends a call setup
+  message along with Tspec along the path to the receiver. The
+  receiver replies with its Rspec back to sender. All routers along
+  the path reserve the requested resources. If any request cannot be
+  met, the particular flow is not admitted and error is sent to sender
+  and receiver. By the end of the reservation step, every router along
+  path has state for this flow (like, how much traffic can it send,
+  what priority) etc.
+
+- Traffic classification and marking. Now, once flow is setup, data
+  can be sent. Now, whenever packet arrives, router looks up flow's
+  IP/port etc to identify the flow, its flowspec etc.
+
+- Traffic policing/shaping. If any router finds that a flow is
+  violating its spec, it can drop excess packets from the flow.
+
+- Scheduling. Finally, all confirming packets are placed in a queue,
+  and router schedules them according to a suitable scheduling
+  scheme. By default, routers use first in first out (FIFO). More
+  sophisticated schemes are needed to provide QoS.
+
+* Does using RSVP make the Internet connection-oriented and reduce
+  robustness? The key ideas of RSVP - receiver oriented and soft state
+  (as opposed to hard state that lives in routers forever). Here,
+  receivers refresh their reservations periodically, so it is okay
+  even if some routers crash. Hence does not violate robustness of the
+  connectionless internet. If routers crash and path changes, router
+  that notices change will resend the request message, and receiver
+  will reply and setup state. RSVP has found uses beyond Intserv, as a
+  general siganling protocol.
+
+* IntServ supports two main types of traffic in addition to best
+  effort. First is "guaranteed service" (for intolerant real time
+  applications). Such flows specify a maximum bound on delay. Second
+  type of traffic in Intserv is called "controlled load", meaning the
+  flows will receive service as if in lightly loaded network. Some
+  combination of all the above mechanisms will help achieve these QoS
+  guarantees.
+
+* Note that only the high-level ideas have been agreed on. No
+  widespread implementation and deployment yet. Needs changes in all
+  layers of the stack: applications have to be re-written to convey
+  the QoS guarantees, routers have to change, that too across all hops
+  of a path. So a lot of inertia to make all these changes.
+
+* A simpler alternative: Diffserv. In diffserv, the edge routers
+  classify and mark packets into one of few classes. The unused TOS
+  field in IP header is used for this. Once classification is done,
+  routers along the path can see this marking and provide service
+  accordingly. Router behavior for different classes is specified in
+  what are called per-hop behaviors (PHB). This is in contrast to
+  end-to-end protocols in Intserv. So, edge marks packets, routers
+  follow PHB, and that's all. Simpler and more scaleble than IntServ.
+
+* After studying the high level architectures, we will study two main
+  ideas in more detail: traffic shaping and router scheduling. Some
+  combination of these ideas is always needed to provide QoS.
+
+* The idea of a token bucket filter (TBF) - used to specify traffic,
+  as well as shape incoming traffic. Think of a bucket in which tokens
+  accumulate at rate "R". The bucket can hold up to "B" tokens, called
+  bucket depth. If no tokens accumulated, flow can send at rate R. If
+  tokens accumulated, it can send up to a burst B. Optionally, the
+  peak rate R can also be specified, so that the burst B doesn't go at
+  a very high rate. 
+
+* For example, consider TBF with R = 1 packet/s. B = 20 packets. P = 5
+  packets/s. Then, if the flow doesn't have any traffic for a long
+  time, it can send at rate P for 4 seconds, after which all tokens in
+  bucket will be empty, and it can subsequently send at rate R.
+
