@@ -1,0 +1,114 @@
+Transport Layer: TCP continued
+==============================
+
+* Recap of TCP congestion control from last lecture: slow start,
+  congestion avoidance, fast recovery.
+
+* What does it mean to "halve cwnd"? Suppose you have sent N packets,
+  and now you set cwnd to N/2. It means you cannot send any more
+  packets till N/2 acks come back. 
+
+* Let us see in detail what happens during fast recovery. Suppose
+  window = 8 and packets 1-8 are outstanding. Now suppose 1 is lost,
+  and dupacks start arriving for packet 1. We retransmit 1. However,
+  we won't get a new ACK at least for another RTT. If 1 was only
+  packet lost, then we will get ACK covering all 8 packets after 1
+  RTT. Then even though window size is 4, and we will have no packets
+  in pipeline. In general, drying out of the pipeline lihe this is not
+  needed for mild congestion caused by dupacks.
+
+* So fast recovery does something called cwnd "inflation". That is,
+  for every dupack, we know a packet has left a pipeline, so we send a
+  new segment. When we enter fast rcovery (after 3 dupacks), we half
+  the cwnd, but increase it by 3 again to compensate for the three
+  packets that reached the receiver. We keep increasing cwnd by 1 MSS
+  for every dupack in fast recovery. Recall from last lecture that a
+  regular definition of cwnd doesn't let us compensate for received
+  packets this way, because window size of 8 means at most 8 packets
+  starting from left edge of window should be outstanding, not any 8
+  packets. So we temporarily "increase" cwnd by 1 segment for every
+  dupack, to allow us to send more packets in the pipeline. This is
+  called cwnd inflation.
+
+* Due to cwnd inflation, when we get 3 dupacks and enter fast
+  recovery, we first set ssthresh = cwnd/2, cwnd = cwnd/2. Then we set
+  cwnd = cwnd + 3 MSS (to account for 3 dupacks). Then for every
+  dupack, we set cwnd = cwnd + 1 MSS. After loss is recovered and we
+  get new ACK, we set cwnd to half the old value (that is stored in
+  ssthresh), and go to congestion avoidance. So for a short period
+  after entering fast recovery, cwnd actually appears to increase
+  before being set to half the old value.
+
+* TCP congestion control summary. : understand 3 states of TCP (slow
+  start, congestion avoidance, fast recovery) and transitions between
+  them. Transitions are triggered by dupacks, new acks, or timeouts.
+
+* In slow start:
+
+- New ACK: cwnd = cwnd + MSS
+- Dupack: For 1 or 2 dupacks, do nothing. For 3 dupacks: cwnd = cwnd/2, cwnd = cwnd + 3, go to fast recovery
+- Timeout: cwnd = 1 MSS, go to slow start.
+- cwnd >= ssthresh: go to congestion avoidance.
+
+* In congestion avoidance:
+- New ACK: cwnd = cwnd + MSS/(cwnd/MSS)
+- Dupack: For 1 or 2 dupacks, do nothing. For 3 dupacks: cwnd = cwnd/2, cwnd = cwnd + 3, go to fast recovery
+- Timeout: cwnd = 1 MSS, go to slow start.
+
+* In fast recovery:
+- New ACK: set cwnd to half the value of cwnd before fast recovery. go to congestion avoidance.
+- Dupack: cwnd = cwnd + 1 MSS, continue in fast recovery. send a new segment for every segment that has reached receiver.
+- Timeout: cwnd = 1 MSS, go to slow start.
+
+* Also, every time we have fast recovery or timeout / slow start, we
+  set ssthresh to half the cwnd where timeout occurred. ssthresh =
+  cwnd/2.
+
+* Older versions of TCP (TCP Tahoe) went into slow start even for
+  dupack triggered losses. Next version of TCP (TCP Reno onwards) use
+  fast recovery. TCP New Reno improves over Reno in that it exists
+  fast recovery only after all the outstanding segments at the time of
+  entering fast recovery have been acked. It retransmits in response
+  to "partial acks". That is, when you do fast retransmit, if another
+  dupack occurs indicating multiple losses in window, NewReno
+  immeidately retransmits that packet also. This way, we can recover
+  from multiple packet losses without going in and out of fast
+  recovery. TCP along with the SACK option lets you learn well about
+  multiple losses in a single window, and recover from them quickly.
+
+* Note that TCP congestion control is inherently unfair to long RTT
+  flows. Whenever a loss happens, it takes an RTT duration to find
+  out. The ACK clock is also dictated by the RTT. Therefore, higher
+  RTT flows see lower throughput.
+
+* The AIMD form of congestion control can take a long time to discover
+  the ideal cwnd, espcially in high BDP networks. However, if we are
+  too aggressive in newer versions, we can be unfair to existing older
+  TCPs. Moreover, TCP must be fair to RTT variations. As a result,
+  there has been lot of work done in designing TCP variants that
+  perform well in a variety of conditions and are "TCP friendly",
+  i.e., work well with older TCPs.
+
+* The default TCP in Linux today is CUBIC, that aims to discover ideal
+  cwnd faster for high bandwidth delay networks. CUBIC is conservative
+  around up to a certain window size, but beyond that, it explores
+  aggressively to discover ideal cwnd in high BDP networks.
+
+* Other variants like TCP Vegas aim to monitor signals other than
+  packet losses to determine the value of cwnd. For example, Vegas
+  detects congestion by realizing that the throughput is flattening
+  out even when the cwnd is increased (as a result of queues building
+  up at the bottleneck). Thus it reduces cwnd when it notices this
+  signal, hopefully much earlier than when the buffer overflows and
+  drops packets. However, Vegas is somewhat sensitive to RTT
+  estimation, and is not widely deployed.
+
+* Different TCP variants differ in the following:
+
+- What are the signals? Most TCP variants use ACKs (new ack / dupack)
+  and timeouts as signals. Some variants use other measurements like
+  rate of sending.
+
+- How is increase/decrease done? TCP Reno does AIMD. Different
+  variants differ in this method.
+

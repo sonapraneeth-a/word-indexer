@@ -1,0 +1,153 @@
+HTTP - advanced topics, DNS
+=============================
+
+* Outline
+- DNS
+- Web services
+- HTTP 2.0: SPDY
+
+
+* DNS: Domain Name System. What is DNS? DNS maps hostnames (e.g.,
+  www.cse.iitb.ac.in) to IP address. How to design such a system?
+  Initially, one file used to hold all mapping when the Internet was
+  only a few hundreds of hosts. Now, such a centralized system won't
+  scale. Instead we use a heirarchical setup for DNS. Let's look at a
+  simplified resolution of the hostname www.cse.iitb.ac.in.
+
+- All DNS requests go to one of the 13 root servers. The root server
+  then redirects to one of the TLD (top level domains), here the
+  server that handles "in" domain. That is, root server says "I can't
+  provide you the IP address of www.cse.iitb.ac.in, but here is the IP
+  address of the server that knows about hosts ending with .in".
+
+- Next, you contact the TLD server for "in" domain, which gives you
+  the IP address of the server for "ac.in". You walk down the
+  hiererchy to the iitb.ac.in name server, to the cse.iitb.ac.in
+  server, which gives you the IP address of the web server (www host)
+  in its domain.
+
+* The name server that is responsible for a certain domain (e.g.,
+  ac.in, iitb.ac.in, cse.iitb.ac.in) is called the authoritative name
+  server for that domain. There are usually more than one for
+  redundancy. You can also outsource your auth server to a third
+  party.
+
+* Every group of hosts also has a "local DNS server" that does all
+  this resolution of contacting multiple hosts for you on your behalf.
+
+* DNS responses can be cached. When you get a name->IP mapping, it
+  comes with a TTL (time to live). You can reuse that mapping in that
+  time without traversing the entire chain again.
+
+* Note that DNS resolves not just names of web servers but also names
+  of mail servers. For example, if you send mail to someone
+  @iitb.ac.in, your SMTP mail server contacts the domain iitb.ac.in
+  asking for the IP address of that SMTP mail server of that domain.
+
+* DNS is also used for load balancing. For example, if you resolve a
+  web server's name, you can get different IP addresses depending on
+  which replica you are assigned to. You can also get multiple IP
+  addresses, and the client can pick a random one.
+
+* DNS servers store different types of records. "A record" maps name
+  to IP address, and this is the most important type of record. An
+  "NS" record maps a name to another name, for example, when you are
+  walking down the hierarchy. For example, when you contact the
+  authoritative server for "ac.in" domain, it gives you an NS record
+  that points to the authoritative server for iitb.ac.in {ac.in,
+  iitb.ac.in, NS}, and an A record of the IP address of the auth
+  server {iitb.ac.in, XXX.XXX.XXX.XXX, A}. With these two, you can
+  contact the next authoritative server in the hierarchy. You also
+  have other types of records: MX records for mail servers, and CNAME
+  records to give an alias to a hostname.
+
+- CDNs - use DNS to match user to closest replica of data. 
+
+* What are web services? Any service you can get using the web or the
+  Internet. Browsing news is one common service people avail. Maps is
+  another. However the term web service usually refers to several
+  machine-to-machine communications that happen over the Internet
+  (beyond the human use of web for just browsing etc). For example,
+  you can view your location on a map, and provide/view real time
+  traffic. Here, you are not only consuming the map information, but
+  you are also populating the database at the mapping service about
+  speed and traffic from your side. The common term for what you can
+  do with web services is: CRUD (create, read, update, delete) any
+  piece of data over the Internet. Summary: web services refer to the
+  generic way of exchanging information over the Internet (usually
+  excluding the easy-to-understand case of human using the Internet).
+
+* The nascent way to implement web services is via RPC (remote
+  procedure call). You have a client that calls a certain procedure on
+  a server with certain parameters. The client and server need to
+  agree on the data format, APIs etc. Some web service standards are
+  built along the lines of this RPC model. For example, SOAP-based web
+  services (google up if you want to know more). A SOAP web service
+  client is tightly coupled with the server, and they both agree on
+  data formats, function calls etc.
+
+* Newer and simpler ways exist to easily develop web services
+  today. One such example is called REST (representational state
+  transfer). REST uses HTTP protocol (can run on anything that
+  supports viewing/updating URIs). It uses the 4 HTTP request verbs
+  (GET, PUT, POST, DELETE) for reading, updating, creating, deleting
+  respectively. For example, you can use GET to get information from a
+  database server, or use PUT to update information at the server. The
+  URL/URI contains information on what you want to get/put. REST is
+  stateless and simple, while RPC is more generic/powerful but
+  complicated to use.
+
+* Now, we will study how HTTP has advanced. The version of HTTP we
+  studied (1.1) had features such as persistent and parallel
+  connections. Subsequently, Google pioneeered a new protocol called
+  SPDY, that has made its way to HTTP 2.0. The main goal was to lower
+  latency of accessing web sites.
+
+* Problems with HTTP which served as motivation for SPDY:
+
+- HTTP can only send one request per connection (no parallelism in the
+  absence of parallel connections). HTTP pipelining options exists
+  (where you send multiple requests at once), but the multiple
+  requests are served in FIFO order, leading to head of line blocking
+  (that is, the first response blocks all other responses). So HTTP
+  pipelining is seldom used.
+
+- All requests are only client initiated. The server cannot help even
+  if it knows the client needs a resoruce.
+
+- Lots of redundancy in the HTTP headers. For example, most headers
+  like "User Agent" do not change and don't have to be repeated.
+
+* Solution: SPDY: layer between HTTP and SSL/TCP. The HTTP protocol
+  still remains same. Some interesting features:
+
+- Multiplexed streams. Multiple requests sent over same TCP
+  connection. Prioritization is requests exist so that no head of line
+  blocking happens for high priority requests.
+
+- Server push (can indicate it is sending an object via a new header,
+  and then push the object), or server hint (just hinting the client
+  to download it)
+
+- HTTP header compression
+
+* Does it improve latency? One paper (in the references) has found
+  that the single TCP connection may sometimes get stuck in a bad
+  state of congestion, especially in cellular networks. HTTP is better
+  because only one of of N connections suffers.
+
+* Recent solution by Google: QUIC Quick UDP Internet Connection. Send
+  HTTP requests over UDP. Do reliability and congestion control inside
+  the application.
+
+* Other approaches to HTTP latency: domain sharding (use multiple
+  domains, so more parallel connections), redesign webpages so that
+  important files get downloaded first, compress Javascript, CSS,
+  iamge files. People have been working on these for a long time.
+
+* Further Reading
+
+- "Towards a SPDY-ier Mobile Web?", Erman et al. This paper presents a
+  real-life measurement study and comparison of HTTP and SPDY.
+
+- Whitepaper on SPDY and QUIC FAQ from Google.
