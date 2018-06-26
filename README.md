@@ -4,16 +4,16 @@ Making Index file (as in the back of book) for a directory.
 
 ## Authors
 
-Sona Praneeth Akula, Siddharth A
+[Sona Praneeth Akula](https://github.com/sonapraneeth-a/), [Siddharth A](https://github.com/asiddharth/)
 
 ## Issues
 
-Currently, the program doesnot run correctly on Windows due to problem in filenames handling.
+- Currently, the program doesnot run correctly on Windows due to problem in filenames handling.
 
 ## Installation
 
 ```bash
-$ # Requires Python3.4
+$ # Requires Python >= 3.4
 $ sudo apt-get install python3-numpy
 $ sudo apt-get install python3-scipy python3-matplotlib # for python plots
 ```
@@ -25,8 +25,8 @@ $ sudo apt-get install python3-scipy python3-matplotlib # for python plots
 - Run the code by typring following command in terminal
 
 ```bash
-$ python3.4 main.py -h # for help on various options for running project
-$ python3.4 main.py -i "indir" # Sample run
+$ python3 main.py -h         # For help on various options available for running project
+$ python3 main.py -i "indir" # Sample run
 ```
 
 - Afterwards open finalIndex.html in Firefox. **No Chrome please as it will show security error**
@@ -35,13 +35,14 @@ $ python3.4 main.py -i "indir" # Sample run
 - Type a word in the searchbox to get list of files along with their line nos in their respective files in a table format
 - Click on either file/line no to get to the word in the required line in file.(Just scroll three lines upwards to see the exact line)
 
-## Versions used:
+## Versions used
 
-- python3.4.3
-- matplotlib 1.3.1: for plotting performance graphs in python, else not required
-- numpy 1.8.2
-- scipy 0.13.3
-- Firefox 42.0 (for client side running)
+| Software    | Version   | Purpose      |
+|-------------|-----------|--------------|
+| Python      | >= 3.4.3  | Development  |
+| Matplotlib  | >= 1.3.1  | For plotting performance graphs in python, else not required |
+| Numpy       | >= 1.8.2  | For plotting performance graphs in python, else not required |
+| Scipy       | >= 0.13.3 | For plotting performance graphs in python, else not required |
 
 **NOTE:** Chrome can be used if html and related files are on server
 
@@ -77,15 +78,16 @@ Optional
 printToText.py
     Prints the index in a text file
 Sample test directories ( 3 directories are present )
-    153050049-15050050-Project/TestDirectories
+    input-text-files/cnn-notes/
 ```
 
 ## Functionality
 
-This project indexes words in a directory. The indexed are shown in a HTML page, which not only provides the functionality of directly viewing the files in which the word is present, but also jumps to the required line number. We also provide the functionality of searching the HTML page for words, so that you need to scroll down the page to find it.
+This project indexes words (notably important) in a directory. The indexed words are shown in a HTML page, which not only provides the functionality of directly viewing the files in which the word is present, but also jumps to the required line number. We also provide the functionality of searching the HTML page for words.
 
 ## Miscellaneous
 
-To create index for your directory. Use the below code in any .py file and run it with python3.4
-as mentioned above in Running section
+To create index for your directory. Use the below code in any .py file and run it with python3 
+as mentioned above in **Running** section
+
 Tested on Firefox 42.0

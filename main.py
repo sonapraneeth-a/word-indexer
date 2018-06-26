@@ -1,48 +1,10 @@
-import sys, getopt, os, time
-import populateDict
-import printHTMLList
-import utility
+from commandline import parse_args
+import sys
 
-# Optional
-import printToText
-import minify
+command_line = "-i \"./input-text-files/cnn-notes\" -o \"index.html\" --debug".split()
 
-utility.getArguments(sys.argv[1:])
+# arguments = " ".join(sys.argv[1:])
+# args = parse_args(args=arguments)
+args = parse_args(args=command_line)
 
-indirName = "Input Directory "+utility.indir;
-outputFile = "Output File "+utility.outfile;
-utility.verbosePrint(indirName, utility.verbose)
-utility.verbosePrint(outputFile, utility.verbose)
-
-# Calculate getAllFilesinDir time
-start_time = time.time()
-reqFiles = printHTMLList.getAllFilesinDir(utility.indir);
-reqFilesTime = time.time() - start_time
-stmt = "Function getAllFilesinDir "+str(reqFilesTime)+"sec"
-utility.verbosePrint(stmt, utility.verbose)
-
-# Calculate populateDict time
-start_time = time.time()
-words = populateDict.populateDict(reqFiles);
-populateDictTime = time.time() - start_time
-stmt = "Function populateDict "+str(populateDictTime)+"sec"
-utility.verbosePrint(stmt, utility.verbose)
-
-# Calculate printToHTMLCompleteList time
-start_time = time.time()
-printHTMLList.printToHTMLCompleteList(words, utility.outfile);
-printToHTMLCompleteListTime = time.time() - start_time
-stmt = "Function printToHTMLCompleteList "+str(printToHTMLCompleteListTime)+"sec"
-utility.verbosePrint(stmt, utility.verbose)
-
-if utility.minifyOpt:
-	minify.minifyFile(utility.outfile, utility.outfile)
-
-# ## Optional
-# # Calculate printToText time
-# # start_time = time.time()
-# # printToText.printToText(words);
-# # printToTextTime = time.time() - start_time
-# # print( 'Function printToText ' , printToTextTime, 'sec')
-# # minify.minifyFile("js/search.js", "js/search-min.js")
-# # minify.minifyFile("index.html", "index-min.html")
+print(args)
